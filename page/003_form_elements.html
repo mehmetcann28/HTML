@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Bileşenleri</title>
+    <style>
+        label{
+            display: inline-block;
+            width: 200px;
+        }
+        input{
+            display: inline-block;
+            width: 250px;
+            height: 22px;
+        }
+        div{
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header" style="text-align: center; color: maroon;">
+        <h1>Form Bileşenleri - Kullanıcı Bilgi Girişleri</h1>
+    </div>
+    <div id="body">
+        <!--
+         input type -> input bileşenini türünü belirtir.
+         Türler: text, radio, password, email, tel, checkbox
+         input name -> form bileşeni ilgili end point e
+         bilgi iletirken değişken adı olarak kullanılır.
+         input id -> bu tag'ın benzersiz numarası
+         label for -> ilgili bileşeni işaret ettiğini
+         belirtmek için kullanırız. gerekli değildir. 
+        -->
+        <!--
+         DİKKAT!!
+         inline element -> sadece kendi hacimleri kadar yer kaplarlar ve
+         kendilerinden sonra gelen element e birleşik şekilde görünürler
+         block element -> bulundukları satırın tamamını kaplarlar
+         inline-block -> her iki türde de davranabilen elementlerdir
+        -->
+         <div>
+        <label for="name">Adınız Soyadınız : </label>
+        <input type="text" name="AdSoyad" id="name">
+        </div>
+        <div>
+        <label for="email">E-Mail Adresiniz : </label>
+        <input type="email" name="email" id="email">
+        </div>
+        <div>
+        <label for="userName">Kullanıcı Adınız : </label>
+        <input type="text" name="userName" id="userName">
+        </div>
+        <div>
+        <label for="sifre">Şifreniz : </label>
+        <input type="password" name="sifre" id="sifre">
+        </div>
+        <div>
+            <label style="font-weight: bolder;">Hangi yazılım dilini seviyorsun?</label> <br>
+            <input type="radio" name="yd" id="yd1"><label>Java</label> <br>
+            <input type="radio" name="yd" id="yd2"><label>C#</label> <br>
+            <input type="radio" name="yd" id="yd3"><label>PHP</label> <br>
+            <input type="radio" name="yd" id="yd4"><label>Go</label> <br>
+            <input type="radio" name="yd" id="yd5"><label>ReactJS</label> <br>
+            <input type="radio" name="yd" id="yd6"><label>TypeScript</label> <br>
+        </div>
+        <div>
+            <label style="font-weight: bolder;">Hangi ilde yaşıyorsun?</label> <br>
+            <select>
+                <option value="01">Adana</option>
+                <option value="06">Ankara</option>
+                <option value="34">İstanbul</option>
+                <option value="55">Samsun</option>
+            </select>
+        </div>
+    </div>
+</body>
+</html>
