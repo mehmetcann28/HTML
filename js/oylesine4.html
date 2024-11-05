@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürün Arama</title>
+    <style>
+        /* CSS kodlarınız burada */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            width: 90%;
+            margin: 40px auto 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            min-height: 200px;
+        }
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+        }
+        .search-box {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+        }
+        .search-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #007BFF;
+            color: #ffffff;
+            cursor: pointer;
+            border-radius: 0 5px 5px 0;
+            transition: background-color 0.3s;
+        }
+        .search-button:hover {
+            background-color: #0056b3;
+        }
+        .product-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #ffffff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            flex: 1 1 calc(25% - 20px);
+            max-width: calc(25% - 20px);
+            box-sizing: border-box;
+        }
+        .product-item:hover {
+            transform: scale(1.02);
+        }
+        .thumbnail img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .product-details {
+            text-align: center;
+        }
+        .product-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .product-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .product-price {
+            font-size: 18px;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+        .product-comments {
+            font-size: 14px;
+            color: #333;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        .comment {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .commenter-name {
+            font-weight: bold;
+            font-size: 14px;
+            color: #007BFF;
+        }
+        .view-more, .hide-comments {
+            color: #007BFF;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: underline;
+            margin-top: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="search-container">
+    <input type="text" id="searchBox" class="search-box" placeholder="Ürün ara...">
+    <button class="search-button" onclick="searchProducts()">Ara</button>
+</div>
+
+<div class="container" id="productList"></div>
+
+<script>
+    function searchProducts() {
+        const query = document.getElementById('searchBox').value;
+        if (query) {
+            // Arama terimini sessionStorage'da saklayalım
+            sessionStorage.setItem('lastSearch', query);
+            loadProducts(query);
+        }
+    }
+
+    function loadProducts(query) {
+        const productList = document.getElementById('productList');
+        productList.innerHTML = ''; // Önceki sonuçları temizle
+
+        fetch(`https://dummyjson.com/products/search?q=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.products.length < 4) {
+                    productList.style.justifyContent = "center";
+                    productList.style.minHeight = "200px";
+                } else {
+                    productList.style.justifyContent = "flex-start";
+                    productList.style.minHeight = "auto";
+                }
+
+                data.products.forEach(product => {
+                    const productItem = document.createElement('div');
+                    productItem.className = 'product-item';
+
+                    productItem.onclick = () => {
+                        window.location.href = `product.html?id=${product.id}`;
+                    };
+
+                    productItem.innerHTML = `
+                        <div class="thumbnail">
+                            <img src="${product.thumbnail}" alt="${product.title}">
+                        </div>
+                        <div class="product-details">
+                            <div class="product-title">${product.title}</div>
+                            <div class="product-description">${product.description}</div>
+                            <div class="product-price">Fiyat: $${product.price}</div>
+                        </div>
+                        <div class="product-comments" id="comments-${product.id}">
+                            <strong>Yorumlar:</strong>
+                        </div>
+                    `;
+
+                    productList.appendChild(productItem);
+
+                    const commentsContainer = document.getElementById(`comments-${product.id}`);
+                    if (product.reviews && product.reviews.length > 0) {
+                        const firstReview = product.reviews[0];
+                        const firstCommentDiv = document.createElement('div');
+                        firstCommentDiv.className = 'comment';
+                        firstCommentDiv.innerHTML = `
+                            <span class="commenter-name">${firstReview.reviewerName}</span>: ${firstReview.comment}
+                        `;
+                        commentsContainer.appendChild(firstCommentDiv);
+
+                        if (product.reviews.length > 1) {
+                            const viewMoreButton = document.createElement('div');
+                            viewMoreButton.className = 'view-more';
+                            viewMoreButton.innerText = "Diğer Yorumları Görüntüle";
+                            commentsContainer.appendChild(viewMoreButton);
+
+                            viewMoreButton.addEventListener('click', () => {
+                                product.reviews.slice(1).forEach(review => {
+                                    const commentDiv = document.createElement('div');
+                                    commentDiv.className = 'comment additional-comment';
+                                    commentDiv.innerHTML = `
+                                        <span class="commenter-name">${review.reviewerName}</span>: ${review.comment}
+                                    `;
+                                    commentsContainer.appendChild(commentDiv);
+                                });
+
+                                viewMoreButton.style.display = 'none';
+
+                                const hideCommentsButton = document.createElement('div');
+                                hideCommentsButton.className = 'hide-comments';
+                                hideCommentsButton.innerText = "Yorumları Gizle";
+                                commentsContainer.appendChild(hideCommentsButton);
+
+                                hideCommentsButton.addEventListener('click', () => {
+                                    commentsContainer.querySelectorAll('.additional-comment').forEach(comment => comment.remove());
+                                    hideCommentsButton.style.display = 'none';
+                                    viewMoreButton.style.display = 'inline-block';
+                                });
+                            });
+                        }
+                    } else {
+                        commentsContainer.innerHTML += `<div class="comment">Henüz yorum yapılmamış.</div>`;
+                    }
+                });
+            });
+    }
+
+    // Sayfa yüklendiğinde son yapılan aramayı sessionStorage'dan alıp ürünleri gösterme
+    window.onload = function() {
+        const lastSearch = sessionStorage.getItem('lastSearch');
+        if (lastSearch) {
+            document.getElementById('searchBox').value = lastSearch;
+            loadProducts(lastSearch);
+        }
+    };
+</script>
+
+</body>
+</html>

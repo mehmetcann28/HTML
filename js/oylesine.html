@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürün Arama</title>
+    <style>
+        .container {
+            width: 60%;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            overflow-y: scroll;
+            height: 90vh;
+        }
+        .search-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .search-box {
+            width: 80%;
+            padding: 8px;
+            font-size: 16px;
+        }
+        .product-item {
+            display: flex;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+            flex-direction: column;
+        }
+        .thumbnail {
+            max-width: 100px;
+            margin-right: 15px;
+        }
+        .thumbnail img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .product-details {
+            flex: 4;
+        }
+        .product-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        .product-description {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .product-price {
+            font-size: 16px;
+            color: #007BFF;
+        }
+        .product-comments {
+            font-size: 13px;
+            margin-top: 10px;
+            color: #333;
+        }
+        .comment {
+            padding: 5px 0;
+            border-top: 1px solid #ddd;
+        }
+        .commenter-name {
+            font-weight: bold;
+            font-size: 14px;
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+
+<div class="search-container">
+    <input type="text" id="searchBox" class="search-box" placeholder="Ürün ara...">
+    <button onclick="searchProducts()">Ara</button>
+</div>
+
+<div class="container" id="productList"></div>
+
+<script>
+    function searchProducts() {
+        const query = document.getElementById('searchBox').value;
+        const productList = document.getElementById('productList');
+        productList.innerHTML = ''; // Önceki sonuçları temizle
+
+        fetch(`https://dummyjson.com/products/search?q=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                data.products.forEach(product => {
+                    // Ürün detaylarını HTML'e ekle
+                    const productItem = document.createElement('div');
+                    productItem.className = 'product-item';
+
+                    productItem.innerHTML = `
+                        <div class="thumbnail">
+                            <img src="${product.thumbnail}" alt="${product.title}">
+                        </div>
+                        <div class="product-details">
+                            <div class="product-title">${product.title}</div>
+                            <div class="product-description">${product.description}</div>
+                            <div class="product-price">Fiyat: $${product.price}</div>
+                        </div>
+                        <div class="product-comments" id="comments-${product.id}">
+                            <strong>Yorumlar:</strong>
+                        </div>
+                    `;
+
+                    productList.appendChild(productItem);
+
+                    // Yorumları ekle
+                    if (product.reviews && product.reviews.length > 0) {
+                        const commentsContainer = document.getElementById(`comments-${product.id}`);
+                        product.reviews.forEach(review => {
+                            const commentDiv = document.createElement('div');
+                            commentDiv.className = 'comment';
+                            commentDiv.innerHTML = `
+                                <span class="commenter-name">${review.reviewerName}</span>: ${review.comment}
+                            `;
+                            commentsContainer.appendChild(commentDiv);
+                        });
+                    } else {
+                        const commentsContainer = document.getElementById(`comments-${product.id}`);
+                        commentsContainer.innerHTML += `<div class="comment">Henüz yorum yapılmamış.</div>`;
+                    }
+                });
+            });
+    }
+</script>
+
+</body>
+</html>

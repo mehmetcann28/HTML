@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürün Detayları</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <style>
+        .item-photo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-right: 1px solid #f6f6f6;
+        }
+        .thumbnail-gallery {
+            display: flex;
+            margin-top: 10px;
+        }
+        .thumbnail-gallery img {
+            width: 50px;
+            height: 50px;
+            margin-right: 5px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .thumbnail-gallery img:hover {
+            border-color: #007BFF;
+        }
+        .menu-items {
+            list-style-type: none;
+            font-size: 11px;
+            display: inline-flex;
+            margin-bottom: 0;
+            margin-top: 20px;
+        }
+        ul.menu-items > li {
+            margin-right: 25px;
+            font-weight: lighter;
+            cursor: pointer;
+        }
+        li.active {
+            border-bottom: 3px solid silver;
+        }
+        .btn-success {
+            width: 100%;
+            border-radius: 0;
+        }
+        .section {
+            width: 100%;
+            margin-left: -15px;
+            padding: 2px;
+            padding-left: 15px;
+            padding-right: 15px;
+            background: #f8f9f9;
+        }
+        .title-price {
+            margin-top: 30px;
+            margin-bottom: 0;
+            color: black;
+        }
+        .title-attr {
+            margin-top: 0;
+            margin-bottom: 0;
+            color: black;
+        }
+        .btn-minus, .btn-plus {
+            cursor: pointer;
+            font-size: 7px;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+            border: 1px solid gray;
+            border-radius: 2px;
+        }
+        div.section > div {
+            width: 100%;
+            display: inline-flex;
+        }
+        div.section > div > input {
+            margin: 0;
+            padding-left: 5px;
+            font-size: 10px;
+            padding-right: 5px;
+            max-width: 18%;
+            text-align: center;
+        }
+        .attr, .attr2 {
+            cursor: pointer;
+            margin-right: 5px;
+            height: 20px;
+            font-size: 10px;
+            padding: 2px;
+            border: 1px solid gray;
+            border-radius: 2px;
+        }
+        .attr.active, .attr2.active {
+            border: 1px solid orange;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .review-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .review {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        .review span {
+            font-weight: bold;
+        }
+        .review-rating {
+            color: #f39c12;
+        }
+        .content-list {
+            margin-top: 20px;
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <!-- Ürün Görseli -->
+            <div class="col-xs-4 item-photo">
+                <img id="productImage" style="max-width:100%;" src="" alt="Ürün görseli">
+                
+                <!-- Küçük Resim Galerisi -->
+                <div class="thumbnail-gallery" id="thumbnailGallery"></div>
+            </div>
+            
+            <!-- Ürün Detayları -->
+            <div class="col-xs-5" style="border:0px solid gray">
+                <h3 id="productTitle"></h3>    
+                <h5 style="color:#337ab7">Satıcı: <a href="#" id="productBrand"></a></h5>
+                
+                <!-- Fiyat -->
+                <h6 class="title-price"><small>Fiyat</small></h6>
+                <h3 id="productPrice" style="margin-top:0px;"></h3>
+
+                <!-- Renk Seçimi -->
+                <div class="section" id="colorSection" style="padding-bottom:5px;">
+                    <h6 class="title-attr"><small>Renk</small></h6>                    
+                    <div>
+                        <div class="attr" style="width:25px; background:#5a5a5a;"></div>
+                        <div class="attr" style="width:25px; background:white;"></div>
+                        <!-- Ek renk seçenekleri -->
+                        <div class="attr" style="width:25px; background:blue;"></div>
+                        <div class="attr" style="width:25px; background:red;"></div>
+                    </div>
+                </div>
+
+                <!-- Adet Seçimi -->
+                <div class="section" style="padding-bottom:20px;">
+                    <h6 class="title-attr"><small>Adet</small></h6>                    
+                    <div>
+                        <div class="btn-minus"><span class="glyphicon glyphicon-minus"></span></div>
+                        <input id="quantity" value="1" />
+                        <div class="btn-plus"><span class="glyphicon glyphicon-plus"></span></div>
+                    </div>
+                </div>                
+
+                <!-- Sepete Ekle Butonu -->
+                <div class="section" style="padding-bottom:20px;">
+                    <button class="btn btn-success"><span style="margin-right:20px" class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Sepete Ekle</button>
+                    <h6><a href="#"><span class="glyphicon glyphicon-heart-empty" style="cursor:pointer;"></span> Favorilere Ekle</a></h6>
+                </div>                                      
+            </div>                              
+
+            <!-- Ürün Bilgileri ve Özellikler -->
+            <div class="col-xs-9">
+                <ul class="menu-items">
+                    <li class="active" data-section="details">Ürün Detayları</li>
+                    <li data-section="warranty">Garanti</li>
+                    <li data-section="seller">Satıcı</li>
+                    <li data-section="shipping">Gönderim</li>
+                </ul>
+                <div style="width:100%;border-top:1px solid silver">
+                    <div id="details" class="content-section active">
+                        <p style="padding:15px;" id="productDescription"></p>
+                        <ul id="productFeatures" class="content-list"></ul>
+                    </div>
+                    <div id="warranty" class="content-section">
+                        <ul class="content-list">
+                            <li>Garanti Bilgisi: <span id="warrantyInfo"></span></li>
+                        </ul>
+                    </div>
+                    <div id="seller" class="content-section">
+                        <ul class="content-list">
+                            <li>Satıcı Bilgisi: <span id="productBrand"></span></li>
+                        </ul>
+                    </div>
+                    <div id="shipping" class="content-section">
+                        <ul class="content-list">
+                            <li>Gönderim Bilgisi: <span id="shippingInfo"></span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yorumlar Bölümü -->
+        <div class="review-section" id="reviewSection">
+            <h4>Yorumlar</h4>
+            <div id="reviewsContainer"></div>
+        </div>
+    </div>        
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        function loadProductDetail() {
+            fetch(`https://dummyjson.com/products/${productId}`)
+                .then(response => response.json())
+                .then(product => {
+                    document.getElementById('productImage').src = product.thumbnail;
+                    document.getElementById('productTitle').textContent = product.title;
+                    document.getElementById('productBrand').textContent = product.brand;
+                    document.getElementById('productPrice').textContent = `₺${product.price}`;
+                    document.getElementById('productDescription').textContent = product.description;
+                    document.getElementById('warrantyInfo').textContent = product.warrantyInformation;
+                    document.getElementById('shippingInfo').textContent = product.shippingInformation;
+
+                    // Küçük resimleri galeriye ekle
+                    const thumbnailGallery = document.getElementById('thumbnailGallery');
+                    product.images.forEach(image => {
+                        const imgElem = document.createElement('img');
+                        imgElem.src = image;
+                        imgElem.onclick = () => {
+                            document.getElementById('productImage').src = image;
+                        };
+                        thumbnailGallery.appendChild(imgElem);
+                    });
+
+                    // Özellikler tablosu
+                    const featuresList = document.getElementById('productFeatures');
+                    const features = {
+                        "Ağırlık": `${product.weight} kg`,
+                        "Boyutlar": `${product.dimensions.width} x ${product.dimensions.height} x ${product.dimensions.depth} cm`,
+                        "Garanti Bilgisi": product.warrantyInformation,
+                        "Gönderim Bilgisi": product.shippingInformation,
+                        "İade Politikası": product.returnPolicy
+                    };
+                    for (const [key, value] of Object.entries(features)) {
+                        const featureItem = document.createElement('li');
+                        featureItem.textContent = `${key}: ${value}`;
+                        featuresList.appendChild(featureItem);
+                    }
+
+                    // Yorumları ekle
+                    const reviewsContainer = document.getElementById('reviewsContainer');
+                    product.reviews.forEach(review => {
+                        const reviewDiv = document.createElement('div');
+                        reviewDiv.className = 'review';
+                        reviewDiv.innerHTML = `
+                            <p><span>${review.reviewerName}</span> - ${new Date(review.date).toLocaleDateString()}</p>
+                            <p class="review-rating">Puan: ${review.rating} / 5</p>
+                            <p>${review.comment}</p>
+                        `;
+                        reviewsContainer.appendChild(reviewDiv);
+                    });
+                })
+                .catch(error => console.error('Ürün detayları yüklenirken hata oluştu:', error));
+        }
+
+        loadProductDetail();
+
+        // jQuery ile sekme kontrolü
+        $(document).ready(function() {
+            $("ul.menu-items > li").on("click", function() {
+                $("ul.menu-items > li").removeClass("active");
+                $(this).addClass("active");
+
+                $(".content-section").removeClass("active");
+                $("#" + $(this).data("section")).addClass("active");
+            });
+
+            $(".attr, .attr2").on("click", function() {
+                var clase = $(this).attr("class");
+                $("." + clase).removeClass("active");
+                $(this).addClass("active");
+            });
+
+            $(".btn-minus").on("click", function() {
+                var now = $(".section > div > input").val();
+                if ($.isNumeric(now)) {
+                    if (parseInt(now) - 1 > 0) { now--; }
+                    $(".section > div > input").val(now);
+                } else {
+                    $(".section > div > input").val("1");
+                }
+            });
+
+            $(".btn-plus").on("click", function() {
+                var now = $(".section > div > input").val();
+                if ($.isNumeric(now)) {
+                    $(".section > div > input").val(parseInt(now) + 1);
+                } else {
+                    $(".section > div > input").val("1");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

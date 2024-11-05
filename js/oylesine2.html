@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürün Arama</title>
+    <style>
+        /* Genel Stiller */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        /* Konteyner */
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            overflow-y: scroll;
+            max-height: 80vh;
+        }
+
+        /* Arama Kutusu ve Butonu */
+        .search-container {
+            margin-top: 20px; /* Üstte boşluk için margin-top eklendi */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .search-box {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+        }
+        .search-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #007BFF;
+            color: #ffffff;
+            cursor: pointer;
+            border-radius: 0 5px 5px 0;
+            transition: background-color 0.3s;
+        }
+        .search-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Ürün Kartları */
+        .product-item {
+            display: flex;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #ffffff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            flex-direction: column;
+        }
+        .product-item:hover {
+            transform: scale(1.02);
+        }
+
+        .thumbnail {
+            max-width: 120px;
+            margin-right: 20px;
+        }
+        .thumbnail img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .product-details {
+            flex: 1;
+            margin-top: 10px;
+        }
+        .product-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .product-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .product-price {
+            font-size: 18px;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        /* Yorumlar Bölümü */
+        .product-comments {
+            font-size: 14px;
+            color: #333;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        .comment {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .commenter-name {
+            font-weight: bold;
+            font-size: 14px;
+            color: #007BFF;
+        }
+        .view-more {
+            color: #007BFF;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: underline;
+            margin-top: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="search-container">
+    <input type="text" id="searchBox" class="search-box" placeholder="Ürün ara...">
+    <button class="search-button" onclick="searchProducts()">Ara</button>
+</div>
+
+<div class="container" id="productList"></div>
+
+<script>
+    function searchProducts() {
+        const query = document.getElementById('searchBox').value;
+        const productList = document.getElementById('productList');
+        productList.innerHTML = ''; // Önceki sonuçları temizle
+
+        fetch(`https://dummyjson.com/products/search?q=`+query)
+            .then(response => response.json())
+            .then(data => {
+                data.products.forEach(product => {
+                    // Ürün detaylarını HTML'e ekle
+                    const productItem = document.createElement('div');
+                    productItem.className = 'product-item';
+
+                    productItem.innerHTML = `
+                        <div class="thumbnail">
+                            <img src="${product.thumbnail}" alt="${product.title}">
+                        </div>
+                        <div class="product-details">
+                            <div class="product-title">${product.title}</div>
+                            <div class="product-description">${product.description}</div>
+                            <div class="product-price">Fiyat: $${product.price}</div>
+                        </div>
+                        <div class="product-comments" id="comments-${product.id}">
+                            <strong>Yorumlar:</strong>
+                        </div>
+                    `;
+
+                    productList.appendChild(productItem);
+
+                    // Yorumları ekle
+                    const commentsContainer = document.getElementById(`comments-${product.id}`);
+                    
+                    if (product.reviews && product.reviews.length > 0) {
+                        // İlk yorumu göster
+                        const firstReview = product.reviews[0];
+                        const firstCommentDiv = document.createElement('div');
+                        firstCommentDiv.className = 'comment';
+                        firstCommentDiv.innerHTML = `
+                            <span class="commenter-name">${firstReview.reviewerName}</span>: ${firstReview.comment}
+                        `;
+                        commentsContainer.appendChild(firstCommentDiv);
+
+                        // "Diğer Yorumları Görüntüle" butonu ekle
+                        if (product.reviews.length > 1) {
+                            const viewMoreButton = document.createElement('div');
+                            viewMoreButton.className = 'view-more';
+                            viewMoreButton.innerText = "Diğer Yorumları Görüntüle";
+                            commentsContainer.appendChild(viewMoreButton);
+
+                            // Diğer yorumları gösterme fonksiyonu
+                            viewMoreButton.addEventListener('click', () => {
+                                product.reviews.slice(1).forEach(review => {
+                                    const commentDiv = document.createElement('div');
+                                    commentDiv.className = 'comment';
+                                    commentDiv.innerHTML = `
+                                        <span class="commenter-name">${review.reviewerName}</span>: ${review.comment}
+                                    `;
+                                    commentsContainer.appendChild(commentDiv);
+                                });
+                                viewMoreButton.style.display = 'none'; // Butonu gizle
+                            });
+                        }
+                    } else {
+                        // Yorum yoksa mesaj göster
+                        commentsContainer.innerHTML += `<div class="comment">Henüz yorum yapılmamış.</div>`;
+                    }
+                });
+            });
+    }
+</script>
+
+</body>
+</html>

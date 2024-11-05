@@ -4,28 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <style>
+        div{
+            margin-bottom: 5px;
+        }
+        label{
+            display: block;
+            margin-bottom: 3px;
+        }
+        input{
+            width: 45%;
+            padding: 5px;
+        }
+    </style>
 </head>
 <body>
-    <form action="#" method="post">
+    <form action="http://localhost:9090/v1/dev/user/register" method="post">
         <div>
-            <label for="adsoyad">Ad Soyad</label>
-            <input type="text" name="adsoyad">
+            <label for="userName">UserName</label>
+            <input type="text" name="userName" required>
         </div>
         <div>
             <label for="email">E-Posta</label>
-            <input type="email" name="email">
+            <input type="email" name="email" required>
         </div>
         <div>
             <label for="password">Şifre</label>
-            <input type="password" name="password">
+            <input type="password" name="password" required>
         </div>
         <div>
-            <label for="repassword">Şifre Doğrulama</label>
-            <input type="password" name="repassword">
+            <label for="rePassword">Şifre Doğrulama</label>
+            <input type="password" name="rePassword" required>
         </div>
         <div>
-            <button type="submit">Üye ol</button>
+            <button onclick="register()" type="submit">Üye ol</button>
         </div>
+
+        <script>
+            const userName = document.getElementById('userName');
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const rePassword = document.getElementById('repassword');
+
+            function register(){
+                if(password.value != rePassword.value){
+                    alert('Şifreler uyuşmuyor lütfen kontrol ediniz.')
+                }else{
+                    fetch('http://localhost:9090/v1/dev/user/register',
+                        {
+                            method:'POST',
+                            headers:{
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                'userName':userName.value,
+                                'email': email.value,
+                                'password': password.value,
+                                'rePassword':rePassword.value
+                            })
+                        }
+                    ).then(data => data.json());
+                    .then(data => console.log(data));
+                }
+            }
+        </script>
     </form>
 </body>
 </html>
