@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ürün Arama</title>
     <style>
-        /* CSS kodlarınız burada */
+        /* Genel Stiller */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -53,6 +53,7 @@
             background-color: #0056b3;
         }
         .product-item {
+            position: relative;
             border: 1px solid #ddd;
             border-radius: 8px;
             padding: 15px;
@@ -62,6 +63,7 @@
             flex: 1 1 calc(25% - 20px);
             max-width: calc(25% - 20px);
             box-sizing: border-box;
+            overflow: hidden;
         }
         .product-item:hover {
             transform: scale(1.02);
@@ -70,6 +72,7 @@
             width: 100%;
             height: auto;
             border-radius: 8px;
+            cursor: pointer;
         }
         .product-details {
             text-align: center;
@@ -79,11 +82,13 @@
             font-size: 18px;
             color: #333;
             margin-bottom: 5px;
+            cursor: pointer;
         }
         .product-description {
             font-size: 14px;
             color: #666;
             margin-bottom: 10px;
+            text-align: left;
         }
         .product-price {
             font-size: 18px;
@@ -114,6 +119,21 @@
             margin-top: 5px;
             display: inline-block;
         }
+        .add-to-cart {
+            padding: 10px 20px;
+            font-size: 14px;
+            background-color: #007BFF;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .product-item:hover .add-to-cart {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -129,7 +149,6 @@
     function searchProducts() {
         const query = document.getElementById('searchBox').value;
         if (query) {
-            // Arama terimini sessionStorage'da saklayalım
             sessionStorage.setItem('lastSearch', query);
             loadProducts(query);
         }
@@ -154,27 +173,42 @@
                     const productItem = document.createElement('div');
                     productItem.className = 'product-item';
 
-                    productItem.onclick = () => {
+                    // Ürün görseline ve başlığına tıklanınca yönlendirme yapılacak
+                    const productImage = document.createElement('div');
+                    productImage.className = 'thumbnail';
+                    productImage.innerHTML = `<img src="${product.thumbnail}" alt="${product.title}">`;
+                    productImage.onclick = () => {
                         window.location.href = `product.html?id=${product.id}`;
                     };
 
-                    productItem.innerHTML = `
-                        <div class="thumbnail">
-                            <img src="${product.thumbnail}" alt="${product.title}">
-                        </div>
-                        <div class="product-details">
-                            <div class="product-title">${product.title}</div>
-                            <div class="product-description">${product.description}</div>
-                            <div class="product-price">Fiyat: $${product.price}</div>
-                        </div>
-                        <div class="product-comments" id="comments-${product.id}">
-                            <strong>Yorumlar:</strong>
-                        </div>
-                    `;
+                    const productTitle = document.createElement('div');
+                    productTitle.className = 'product-title';
+                    productTitle.textContent = product.title;
+                    productTitle.onclick = () => {
+                        window.location.href = `product.html?id=${product.id}`;
+                    };
 
-                    productList.appendChild(productItem);
+                    // Açıklama, fiyat ve yorumlar için tıklama olayını durdur
+                    const productDescription = document.createElement('div');
+                    productDescription.className = 'product-description';
+                    productDescription.textContent = product.description;
+                    productDescription.onclick = (event) => event.stopPropagation();
 
-                    const commentsContainer = document.getElementById(`comments-${product.id}`);
+                    const productPrice = document.createElement('div');
+                    productPrice.className = 'product-price';
+                    productPrice.textContent = `Fiyat: $${product.price}`;
+                    productPrice.onclick = (event) => event.stopPropagation();
+
+                    const productComments = document.createElement('div');
+                    productComments.className = 'product-comments';
+                    productComments.innerHTML = `<strong>Yorumlar:</strong>`;
+                    productComments.onclick = (event) => event.stopPropagation();
+
+                    const commentsContainer = document.createElement('div');
+                    commentsContainer.id = `comments-${product.id}`;
+                    commentsContainer.onclick = (event) => event.stopPropagation();
+                    productComments.appendChild(commentsContainer);
+
                     if (product.reviews && product.reviews.length > 0) {
                         const firstReview = product.reviews[0];
                         const firstCommentDiv = document.createElement('div');
@@ -188,9 +222,8 @@
                             const viewMoreButton = document.createElement('div');
                             viewMoreButton.className = 'view-more';
                             viewMoreButton.innerText = "Diğer Yorumları Görüntüle";
-                            commentsContainer.appendChild(viewMoreButton);
-
-                            viewMoreButton.addEventListener('click', () => {
+                            viewMoreButton.onclick = (event) => {
+                                event.stopPropagation();
                                 product.reviews.slice(1).forEach(review => {
                                     const commentDiv = document.createElement('div');
                                     commentDiv.className = 'comment additional-comment';
@@ -199,29 +232,43 @@
                                     `;
                                     commentsContainer.appendChild(commentDiv);
                                 });
-
                                 viewMoreButton.style.display = 'none';
-
                                 const hideCommentsButton = document.createElement('div');
                                 hideCommentsButton.className = 'hide-comments';
                                 hideCommentsButton.innerText = "Yorumları Gizle";
                                 commentsContainer.appendChild(hideCommentsButton);
 
-                                hideCommentsButton.addEventListener('click', () => {
+                                hideCommentsButton.onclick = (event) => {
+                                    event.stopPropagation();
                                     commentsContainer.querySelectorAll('.additional-comment').forEach(comment => comment.remove());
                                     hideCommentsButton.style.display = 'none';
                                     viewMoreButton.style.display = 'inline-block';
-                                });
-                            });
+                                };
+                            };
+                            commentsContainer.appendChild(viewMoreButton);
                         }
                     } else {
                         commentsContainer.innerHTML += `<div class="comment">Henüz yorum yapılmamış.</div>`;
                     }
+
+                    // Sepete ekle butonunu yorumların altına ekleyin
+                    const addToCartButton = document.createElement('div');
+                    addToCartButton.className = 'add-to-cart';
+                    addToCartButton.textContent = 'Sepete Ekle';
+                    addToCartButton.onclick = (event) => event.stopPropagation();
+
+                    productItem.appendChild(productImage);
+                    productItem.appendChild(productTitle);
+                    productItem.appendChild(productDescription);
+                    productItem.appendChild(productPrice);
+                    productItem.appendChild(productComments);
+                    productItem.appendChild(addToCartButton); // Sepete Ekle butonunu yorumların altına ekledik
+
+                    productList.appendChild(productItem);
                 });
             });
     }
 
-    // Sayfa yüklendiğinde son yapılan aramayı sessionStorage'dan alıp ürünleri gösterme
     window.onload = function() {
         const lastSearch = sessionStorage.getItem('lastSearch');
         if (lastSearch) {
